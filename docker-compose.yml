@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  rstudio:
+    image: "rstudio:4.2.2"
+    ports:
+      - "8787:8787"
+    volumes:
+      - type: "bind"
+        source: "."
+        target: "/home/rstudio"
+      - type: "bind"
+        source: "~/Documents/renv/cache"
+        target: "/renv/cache"

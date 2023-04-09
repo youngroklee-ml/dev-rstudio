@@ -1,0 +1,8 @@
+.DS_Store
+.Rhistory
+.Rprofile
+.bash_history
+.cache/
+.config/
+.local/
+Readme.rtf
