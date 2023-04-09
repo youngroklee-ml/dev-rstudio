@@ -1,13 +1,66 @@
 # RStudio Docker Container on Apple M1
 
+I was inspired by [Rami Krispin](https://github.com/RamiKrispin)'s and [Eric Nantz](https://github.com/rpodcast)'s sharing how to do R development in docker environment. In addition to their github repositories, here are some videos that helped me better understand their approaches.
+
+- [R-ladies Tunis Workshop: Introduction to Docker for R users](https://youtu.be/bGwjO07DmAY) by Rami Krispin
+- [Fully containerized R dev environment with Docker, RStudio, and VS-Code](https://www.youtube.com/live/4wRiPG9LM3o?feature=share) by Eric Nantz
+
+This repository is to make R development in docker container with RStudio IDE possible in a computer with Apple M1 chip. A year ago, I have never built a docker image by myself, and still I am not an expert. I tried to find a solution in a level that I can understand, and I hope this repository helps other people who try to use docker for R project development.
+
+If you have not used docker before, I think there are many resources out there to learn about docker. A resorce that host helped me was 3-hour tutorial on YouTube: [Docker Tutorial for Beginners](https://youtu.be/3c-iBn73dDE) in *TechWorld with Nana* channel.
+
+
+## Quick instruction to build docker image & run docker container
+
+### Build docker image
+
+Run the following command in terminal within a folder that Dockerfile is located.
+
+```
+docker build . -t rstudio:4.2.2
+```
+
+### Edit docker-compose.yml file
+
+Edit docker-compose.yml file with a path in your computer to store r package caches. Please read **Bind host computer directory for renv cache** section below for more details.
+
+```
+volumes:
+  - type: "bind"
+    source: "PLEASE SET YOUR OWN PATH HERE"
+    target: "/renv/cache"
+```
+
+
+### Run docker container
+
+Run the following command in terminal within a folder that docker-compose.yml is located.
+
+```
+docker compose up -d
+```
+
+### Start RStudio
+
+Open web browser (like Safari, Chrome, etc.) and open URL `http://127.0.0.1:8787`
+
+### Stop docker container
+
+When you want to shutdown docker container, run the following command in terminal
+
+```
+docker compose down
+```
+
+
 ## Background
 
-Rami Krispins highly recommended development in docker container when I asked his advise on how to make more reproducible and deployable work. I tried to follow [Rami Krispins's example](https://github.com/RamiKrispin/ggplot2-graphic-design), but experienced two pain points.
+Rami Krispin highly recommended development in docker container when I asked his advice during rstudio::conf 2022 on how to organize analysis project to be more reproducible and deployable. That was really great advice, and Rami generously shared his practices on his github repository with public access. I really appreciated it! Right after coming back from the conference trip, I tried to follow docker configuration in [Rami Krispin's example](https://github.com/RamiKrispin/ggplot2-graphic-design). On my Apple M1 machine, unfortunately I experienced a couple of major challenges that made me hesitate to immediately switch my development environment to docker container.
 
 1. It did not smoothly work on my Apple M1 machine, so I had to research into how to make dev environment on Apple M1.
 2. It took very long time to install R packages in docker. I wanted to make the installation be less time consuming.
 
-I researched into methods to mitigate those pain points, and I think I found a reasonable stop-gap solution.
+I researched into ways to move forward, and I think I found a reasonable stop-gap solution. It took a while for me to figure out what is going on, and I wanted to share the stop-gap solution. I admit that I am not expert in docker, so there may be a better approach to set up dev environment on Apple M1 with RStudio. However, I hope this repository can provide at least "working" solution with some rationale.
 
 
 ## Use rocker/r-ver instead of rocker/rstudio
@@ -19,14 +72,14 @@ My Dockerfile is mostly based on approached described by [eitsupi](https://githu
 
 ## Bind host computer directory for renv cache
 
-I followed [Eric Nantz's setup](https://github.com/rpodcast/r_dev_projects) to bind host computer directory for caching installed packages.
+I got a hint from [Eric Nantz's setup](https://github.com/rpodcast/r_dev_projects) to bind host computer directory for caching installed packages.
 
-renv cache will allow you to reduce redundant compile of packages that you may use in multiple docker containers. In docker-compose.yml file, bind a path on local (host) computer that cache will be stored to docker directory `/renv/cache`. (Note: Here, I hard coded my local directory to simplify this example, but it would be better to manage the local path with either separate configuration file or environment variable in hosting computer.)
+renv cache will allow you to reduce redundant compile of packages that you may use in multiple docker containers. In docker-compose.yml file, bind a path on local (host) computer that cache will be stored to docker directory `/renv/cache`. (Note: In this repository, I hard coded my local directory to simplify the configuration, but it would be better to manage the local path with either separate configuration file or environment variable in hosting computer.)
 
 ```
 volumes:
   - type: "bind"
-    source: "~/Documents/renv/cache"
+    source: "PLEASE SET YOUR OWN PATH HERE"
     target: "/renv/cache"
 ```
 
@@ -100,37 +153,6 @@ RUN apt-get update && apt-get install -y libgit2-dev \
 
 
 Once you add script to install missing dependencies, rebuilding the docker image and restarting docker container will allow you to install R package that you originally failed due to the missing dependencies.
-
-
-## Build & Run
-
-### Build docker image
-
-Run the following command in terminal within a folder that Dockerfile is located.
-
-```
-docker build . -t rstudio:4.2.2
-```
-
-### Run docker container
-
-Run the following command in terminal within a folder that docker-compose.yml is located.
-
-```
-docker compose up -d
-```
-
-### Start RStudio
-
-Open web browser (like Safari, Chrome, etc.) and open URL `http://127.0.0.1:8787`
-
-### Stop docker container
-
-When you want to shutdown docker container, run the following command in terminal
-
-```
-docker compose down
-```
 
 
 
