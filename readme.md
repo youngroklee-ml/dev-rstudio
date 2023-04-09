@@ -69,6 +69,18 @@ My Dockerfile is mostly based on approached described by [eitsupi](https://githu
 
 [rocker/rstudio:4.2.2](https://hub.docker.com/r/rocker/rstudio/tags?page=1&name=4.2.2) does not support linux/arm64 as of 2023-04-03. Therefore, I used [rocker/r-ver:4.2.2 linux/arm64](https://hub.docker.com/layers/rocker/r-ver/4.2.2/images/sha256-1c3dbc493f550947111dec18face91d719c47603ec01365d687ef04acf19828e?context=explore) as base image and added additional steps that are defined within [rocker/rstudio:4.2.2 linux/amd64](https://hub.docker.com/layers/rocker/rstudio/4.2.2/images/sha256-79fa61b6b9dbaf066914fbd9c380cecffd007439dab126e25ee68d5c266053a9?context=explore) EXCEPT Quarto installation that currently does not seem to support linux/arm64 yet.
 
+```
+FROM rocker/r-ver:4.2.2
+
+ENV S6_VERSION=v2.1.0.2
+ENV RSTUDIO_VERSION=2022.12.0+353
+ENV DEFAULT_USER=rstudio
+ENV PANDOC_VERSION=default
+ENV PATH=/usr/lib/rstudio-server/bin:$PATH
+
+RUN /rocker_scripts/install_rstudio.sh
+RUN /rocker_scripts/install_pandoc.sh
+```
 
 ## Bind host computer directory for renv cache
 
