@@ -93,9 +93,18 @@ RUN echo "RENV_PATHS_CACHE=/renv/cache" >> /usr/local/lib/R/etc/Renviron
 RUN install2.r -e renv
 ```
 
-With this docker image and container configuration, when new R package is installed in docker container, it will be cached in your host computer, and the cache will be used when you need to reinstall the same package (i.e. same version) either within the same docker container or in any other container in the host computer. Installing a package that has not been cached in host machine may take some time, even over than an hour when you install some meta-package like **tidyverse**. The second-time installation, however, will be quick because you would already have the cached package to link.
+With this docker image and container configuration, when new R package is installed in docker container, it will be cached in your host computer. Below are snapshots of renv cache folder in host computer (i.e. `source` in docker-compose.yml) and in docker container (i.e. `target` in docker-compose.yml) that show the same list of packages.
 
-This simple additional configuration works well when base image is rocker/r-ver:4.2.2, but it does not work well in earlier version. Detailed explanation is in the following section.
+![renv cache binding source directory in host computer](./images/renv-cache-host-computer.png)
+*renv cache binding source directory in host computer*
+
+![renv cache binding target directory in docker container](./images/renv-cache-docker-container.png)
+*renv cache binding target directory in docker container*
+
+The cache will be used when you need to reinstall the same package (i.e. same version) either within the same docker container or in any other container in the host computer. Installing a package that has not been cached in host machine may take some time, even over than an hour when you install some meta-package like **tidyverse**. The second-time installation, however, will be quick because you would already have the cached package to link.
+
+
+This simple configuration works well when base image is rocker/r-ver:4.2.2, but it did not work well in earlier version. Detailed explanation is in the following section.
 
 
 ### renv 0.17
